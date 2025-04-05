@@ -1,19 +1,29 @@
-import smtplib
 import os
-from email.mime.text import MIMEText
 from datetime import datetime
 
-# Using environment variables to hide sensitive info
+TRACKER_FILE = os.path.expanduser("~/.fsociety_tracker")
+
 def notify():
-    sender_email = os.getenv('SENDER_EMAIL')
-    receiver_email = os.getenv('RECEIVER_EMAIL')
-    email_password = os.getenv('EMAIL_PASSWORD')
+    try:
+        # Create the hidden tracker file if it doesn't exist
+        if not os.path.exists(TRACKER_FILE):
+            with open(TRACKER_FILE, 'w') as f:
+                f.write("0")
 
-    msg = MIMEText(f"Tool used on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    msg["Subject"] = "Fsociety Tool Usage"
-    msg["From"] = sender_email
-    msg["To"] = receiver_email
+        # Read current count
+        with open(TRACKER_FILE, 'r') as f:
+            count = int(f.read().strip())
 
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-        server.login(sender_email, email_password)
-        server.send_message(msg)
+        # Increment count
+        count += 1
+
+        # Overwrite with updated count
+        with open(TRACKER_FILE, 'w') as f:
+            f.write(str(count))
+
+        # Optional: Save timestamped log
+        with open("/fsociety/reports/usage.log", 'a') as log:
+            log.write(f"[{datetime.now()}] Tool used {count} times\n")
+
+    except Exception:
+        pass  # Silently ignore all issues
