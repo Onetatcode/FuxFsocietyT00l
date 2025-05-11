@@ -1,5 +1,28 @@
 #!/bin/bash
-# fsociety launcher
+# ──[ fsociety CLI Launcher ]──────────────────────────────
 
-echo "[+] Launching fsociety CLI..."
-python3 main.py
+clear
+echo -e "\e[1;36m[+] Launching fsociety CLI...\e[0m"
+
+# Check for Python 3
+if ! command -v python3 &> /dev/null; then
+    echo -e "\e[1;31m[!] Python3 is not installed. Please install it first.\e[0m"
+    exit 1
+fi
+
+# Check if main.py exists
+if [ ! -f "main.py" ]; then
+    echo -e "\e[1;31m[!] main.py not found in current directory.\e[0m"
+    exit 1
+fi
+
+# Activate virtual environment if present
+if [ -d "venv" ]; then
+    source venv/bin/activate
+    echo -e "\e[1;32m[+] Virtual environment activated.\e[0m"
+fi
+
+# Launch fsociety
+python3 main.py "$@"
+
+echo -e "\e[1;34m[✓] Exiting fsociety...\e[0m"
